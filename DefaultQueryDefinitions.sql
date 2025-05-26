@@ -377,7 +377,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY RDC meters shipment f
             where n_type=''RDC'' and labor.laborid=n_relatedstore.laborid and  exists (
               select 1 
               from maxuser 
-              where labor.personid=maxuser.personid and  userid =:userid
+              where labor.personid=maxuser.personid and  userid =:user
             )
           )
         )
@@ -400,7 +400,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY RDC meters shipment f
             where n_type=''RDC'' and labor.laborid=n_relatedstore.laborid and  exists (
               select 1 
               from maxuser 
-              where labor.personid=maxuser.personid and  userid =:userid
+              where labor.personid=maxuser.personid and  userid =:user
             )
           )
         )
@@ -423,7 +423,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY RDC meters shipment f
             where n_type=''RDC'' and personid in (
               select personid 
               from maxuser 
-              where userid = :userid
+              where userid = :user
             )
           )  and exists(select 1 from invuseline where invuseline.invuselineid = shipmentline.invuselineid and invuseline.n_sap_to_sloc >=''5000'' and invuseline.n_sap_from_sloc >=''5000'' and invuseline.n_sap_to_plant=n_rdcstoreroom)
         )
