@@ -683,7 +683,7 @@ and po.n_sap_from_sloc  < ''5000''
             where n_type=''CNC'' and personid in (
               select personid 
               from maxuser 
-              where userid = ''Z4837655''  
+              where userid = :user  
             )
           )
           and po.n_sap_from_plant = n_rdcstoreroom and  po.n_sap_from_sloc = n_cncstoreroom 
