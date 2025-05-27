@@ -13,7 +13,7 @@ BEGIN
 END
 
 
-DELETE FROM QUERY WHERE clausename IN ('MY RDC Obsolete meters shipment from CNC','MY PO TO BE RECEIVED','MY RDC meters shipment from RDC','MY RDC Serviceable meters shipment from CNC','MY CNC meters shipment from RDC','MY RDC Scrappable meters shipment from CNC','MY RDC meters shipment from CPM','MY RDC meters shipment from LAB','My RDC SAP RESERVATION TO RDC','My RDC SAP RESERVATION TO CNC','My RDC SAP RESERVATION TO CPM','My RDC SAP RESERVATION TO PROJECT','MY CNC meters shipment from CNC','MY CNC meters shipment from LAB','My CNC SAP RESERVATION TO RDC','My CNC SAP RESERVATION TO CNC','My CNC SAP RESERVATION TO TSU','My CNC SAP RESERVATION TO PROJECT','MY CPM meters shipment from RDC','MY LAB meters shipment from RDC','MY LAB meters shipment from CNC','MY LAB meters shipment from CPM');
+DELETE FROM QUERY WHERE clausename IN ('MY RDC Obsolete meters shipment from CNC','MY CNC SAP RESERVATION TO EP','MY PO TO BE RECEIVED','MY RDC meters shipment from RDC','MY RDC Serviceable meters shipment from CNC','MY CNC meters shipment from RDC','MY RDC Scrappable meters shipment from CNC','MY RDC meters shipment from CPM','MY RDC meters shipment from LAB','My RDC SAP RESERVATION TO RDC','My RDC SAP RESERVATION TO CNC','My RDC SAP RESERVATION TO CPM','My RDC SAP RESERVATION TO PROJECT','MY CNC meters shipment from CNC','MY CNC meters shipment from LAB','My CNC SAP RESERVATION TO RDC','My CNC SAP RESERVATION TO CNC','My CNC SAP RESERVATION TO TSU','My CNC SAP RESERVATION TO PROJECT','MY CPM meters shipment from RDC','MY LAB meters shipment from RDC','MY LAB meters shipment from CNC','MY LAB meters shipment from CPM');
 COMMIT;
 
 
@@ -669,5 +669,32 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY RDC Obsolete meters s
           )  and exists(select 1 from invuseline where invuseline.invuselineid = shipmentline.invuselineid and invuseline.n_sap_to_sloc >=''5000'' and invuseline.n_sap_from_sloc <''5000'' and invuseline.n_sap_to_plant=n_rdcstoreroom)
         )
       )', 1, 'EN', NULL, NULL, 0, NULL);
+
+INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
+VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'MY CNC SAP RESERVATION TO EP', 'Z4837655', 'SAP Reservation from my CNC to EP', 'historyflag = 0 
+and po.n_sap_from_sloc  < ''5000''
+  and n_po_type=''SAPRESERVATION''
+  and  exists (
+        select 1 
+          from n_relatedstore
+          where laborid in (
+            select laborid 
+            from labor 
+            where n_type=''CNC'' and personid in (
+              select personid 
+              from maxuser 
+              where userid = ''Z4837655''  
+            )
+          )
+          and po.n_sap_from_plant = n_rdcstoreroom and  po.n_sap_from_sloc = n_cncstoreroom 
+        )
+     and  exists (
+    select 1 
+    from poline 
+    where poline.ponum = po.ponum 
+      and poline.siteid = po.siteid 
+      and poline.revisionnum = po.revisionnum
+      and poline.n_sap_wbs is not null
+  )', 1, 'EN', NULL, NULL, 0, NULL);
 
 COMMIT;
