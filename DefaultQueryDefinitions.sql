@@ -506,7 +506,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My CNC SAP RESERVATION TO PROJECT', 'Z
           where laborid in (
             select laborid 
             from labor 
-            where n_type=''RDC'' and personid in (
+            where n_type=''CNC'' and personid in (
               select personid 
               from maxuser 
               where userid =:user
@@ -520,7 +520,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My CNC SAP RESERVATION TO PROJECT', 'Z
     where poline.ponum = po.ponum 
       and poline.siteid = po.siteid 
       and poline.revisionnum = po.revisionnum
-      and poline.n_sap_wbs is not null AND poline.N_REMAININGQTY > 0
+      and poline.n_sap_wbs is not null AND poline.N_REMAININGQTY > 0 and (POLINE.N_IGNORERECEIPT=0 and POLINE.N_DELETED=0)
   )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
