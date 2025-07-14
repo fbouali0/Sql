@@ -1,4 +1,6 @@
 
+
+
 BEGIN
   DECLARE max_id INTEGER DEFAULT 0;
 
@@ -15,46 +17,8 @@ COMMIT;
 DELETE FROM QUERY WHERE clausename IN ('MY RDC Obsolete meters shipment from CNC','MY CNC SAP RESERVATION TO EP','MY PO TO BE RECEIVED','MY RDC meters shipment from RDC','MY RDC Serviceable meters shipment from CNC','MY CNC meters shipment from RDC','MY RDC Scrappable meters shipment from CNC','MY RDC meters shipment from CPM','MY RDC meters shipment from LAB','My RDC SAP RESERVATION TO RDC','My RDC SAP RESERVATION TO CNC','My RDC SAP RESERVATION TO CPM','My RDC SAP RESERVATION TO PROJECT','MY CNC meters shipment from CNC','MY CNC meters shipment from LAB','My CNC SAP RESERVATION TO RDC','My CNC SAP RESERVATION TO CNC','My CNC SAP RESERVATION TO TSU','My CNC SAP RESERVATION TO PROJECT','MY CPM meters shipment from RDC','MY LAB meters shipment from RDC','MY LAB meters shipment from CNC','MY LAB meters shipment from CPM');
 COMMIT;
 
-
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
-VALUES (QUERYSEQ.NEXTVAL, 'N_METERSRECEIPTS', 'MY PO TO BE RECEIVED', 'Z4837655', 'Material to be received in My RDC from supplier', 'historyflag = 0  
-  and status = ''APPR''
-  and n_po_type!=''SAPRESERVATION''
-  and receipts != ''COMPLETE'' 
-  and exists (
-    select 1 
-    from poline 
-    where poline.ponum = po.ponum 
-      and poline.siteid = po.siteid 
-      and poline.revisionnum = po.revisionnum
-      and exists (
-        select 1
-        from locations
-        where location in (
-          select n_rdcstoreroom
-          from n_relatedstore
-          where n_cncstoreroom is null 
-           and laborid in (
-            select laborid 
-            from labor 
-            where personid in (
-              select personid 
-              from maxuser 
-              where userid = :user 
-            )
-          )
-        )
-        and (exists( select 1 from n_receivingstore where  n_receivingstore.locationsid = locations.locationsid and n_receivingstore.storeroom = poline.storeloc)
-        or 
-        (
-           poline.storeloc in (location, n_aggregatedstore)
-        )
-        )
-      )
-  )', 1, 'EN', NULL, NULL, 0, NULL);
-
-INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
-VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY CNC meters shipment from CNC', 'Z4837655', 'Shipment of  Meters from another CNC to my CNC', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and INVUSE.STATUS != ''CANCELLED'' )
+VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY CNC meters shipment from CNC', 'MAXADMIN', 'Shipment of  Meters from another CNC to my CNC', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and INVUSE.STATUS != ''CANCELLED'' )
   and exists (
     select 1 
     from shipmentline 
@@ -77,7 +41,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY CNC meters shipment f
       )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
-VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY CNC meters shipment from LAB', 'Z4837655', 'Shipment of  Meters from LAB to my CNC', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and INVUSE.STATUS != ''CANCELLED'' )
+VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY CNC meters shipment from LAB', 'MAXADMIN', 'Shipment of  Meters from LAB to my CNC', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and INVUSE.STATUS != ''CANCELLED'' )
   and exists (
     select 1 
     from shipmentline 
@@ -102,7 +66,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY CNC meters shipment f
       )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
-VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY CNC meters shipment from RDC', 'Z4837655', 'Shipment of  Meters from RDC to my CNC', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and INVUSE.STATUS != ''CANCELLED'' )
+VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY CNC meters shipment from RDC', 'MAXADMIN', 'Shipment of  Meters from RDC to my CNC', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and INVUSE.STATUS != ''CANCELLED'' )
   and exists (
     select 1 
     from shipmentline 
@@ -125,7 +89,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY CNC meters shipment f
       )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
-VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY CPM meters shipment from RDC', 'Z4837655', 'Shipment of  Meters from RDC to my CPM', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and INVUSE.STATUS != ''CANCELLED'')
+VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY CPM meters shipment from RDC', 'MAXADMIN', 'Shipment of  Meters from RDC to my CPM', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and INVUSE.STATUS != ''CANCELLED'')
 
   and exists (
 
@@ -168,7 +132,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY CPM meters shipment f
       )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
-VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY LAB meters shipment from CNC', 'Z4837655', 'Shipment of  Meters from CNC to my LAB', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and INVUSE.STATUS != ''CANCELLED'')
+VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY LAB meters shipment from CNC', 'MAXADMIN', 'Shipment of  Meters from CNC to my LAB', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and INVUSE.STATUS != ''CANCELLED'')
 
   and exists (
 
@@ -211,7 +175,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY LAB meters shipment f
       )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
-VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY LAB meters shipment from CPM', 'Z4837655', 'Shipment of  Meters from CPM to my LAB', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and INVUSE.STATUS != ''CANCELLED'' )
+VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY LAB meters shipment from CPM', 'MAXADMIN', 'Shipment of  Meters from CPM to my LAB', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and INVUSE.STATUS != ''CANCELLED'' )
 
   and exists (
 
@@ -254,7 +218,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY LAB meters shipment f
       )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
-VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY LAB meters shipment from RDC', 'Z4837655', 'Shipment of  Meters from RDC to my LAB', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and INVUSE.STATUS != ''CANCELLED'')
+VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY LAB meters shipment from RDC', 'MAXADMIN', 'Shipment of  Meters from RDC to my LAB', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and INVUSE.STATUS != ''CANCELLED'')
 
   and exists (
 
@@ -297,7 +261,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY LAB meters shipment f
       )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
-VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY RDC Obsolete meters shipment from CNC', 'Z4837655', 'Shipment of  Obsolete Meters from CNC to my RDC', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and INVUSE.STATUS != ''CANCELLED'' )
+VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY RDC Obsolete meters shipment from CNC', 'MAXADMIN', 'Shipment of  Obsolete Meters from CNC to my RDC', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and INVUSE.STATUS != ''CANCELLED'' )
   and exists (
     select 1 
     from shipmentline 
@@ -320,7 +284,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY RDC Obsolete meters s
       )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
-VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY RDC Scrappable meters shipment from CNC', 'Z4837655', 'Shipment of  Scrappable Meters from CNC to my RDC', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and INVUSE.STATUS != ''CANCELLED'' )
+VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY RDC Scrappable meters shipment from CNC', 'MAXADMIN', 'Shipment of  Scrappable Meters from CNC to my RDC', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and INVUSE.STATUS != ''CANCELLED'' )
   and exists (
     select 1 
     from shipmentline 
@@ -343,7 +307,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY RDC Scrappable meters
       )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
-VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY RDC Serviceable meters shipment from CNC', 'Z4837655', 'Shipment of  Serviceable Meters from CNC to my RDC', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and INVUSE.STATUS != ''CANCELLED'')
+VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY RDC Serviceable meters shipment from CNC', 'MAXADMIN', 'Shipment of  Serviceable Meters from CNC to my RDC', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and INVUSE.STATUS != ''CANCELLED'')
   and exists (
     select 1 
     from shipmentline 
@@ -366,7 +330,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY RDC Serviceable meter
       )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
-VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY RDC meters shipment from CPM', 'Z4837655', 'Shipment of Meters from CPM to my RDC', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and INVUSE.STATUS != ''CANCELLED'')
+VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY RDC meters shipment from CPM', 'MAXADMIN', 'Shipment of Meters from CPM to my RDC', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and INVUSE.STATUS != ''CANCELLED'')
   and exists (
     select 1 
     from shipmentline 
@@ -391,7 +355,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY RDC meters shipment f
       )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
-VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY RDC meters shipment from LAB', 'Z4837655', 'Shipment of  Meters from LAB to my RDC', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and INVUSE.STATUS != ''CANCELLED'')
+VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY RDC meters shipment from LAB', 'MAXADMIN', 'Shipment of  Meters from LAB to my RDC', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and INVUSE.STATUS != ''CANCELLED'')
   and exists (
     select 1 
     from shipmentline 
@@ -416,7 +380,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY RDC meters shipment f
       )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
-VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY RDC meters shipment from RDC', 'Z4837655', 'Shipment of  Meters from another RDC to my RDC', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and INVUSE.STATUS != ''CANCELLED'' )
+VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY RDC meters shipment from RDC', 'MAXADMIN', 'Shipment of  Meters from another RDC to my RDC', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and INVUSE.STATUS != ''CANCELLED'' )
   and exists (
     select 1 
     from shipmentline 
@@ -439,7 +403,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY RDC meters shipment f
       )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
-VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'MY CNC SAP RESERVATION TO EP', 'Z4837655', 'SAP Reservation from my CNC to EP', 'historyflag = 0 
+VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'MY CNC SAP RESERVATION TO EP', 'MAXADMIN', 'SAP Reservation from my CNC to EP', 'historyflag = 0 
  and po.n_sap_from_sloc  < ''5000''
   and n_po_type=''SAPRESERVATION''
   and  exists (
@@ -466,7 +430,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'MY CNC SAP RESERVATION TO EP', 'Z48376
   )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
-VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My CNC SAP RESERVATION TO CNC', 'Z4837655', 'SAP Reservation from my  CNC to another CNC', 'historyflag = 0 
+VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My CNC SAP RESERVATION TO CNC', 'MAXADMIN', 'SAP Reservation from my  CNC to another CNC', 'historyflag = 0 
 
  and po.n_sap_from_sloc <''5000''
   and n_po_type=''SAPRESERVATION''
@@ -495,7 +459,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My CNC SAP RESERVATION TO CNC', 'Z4837
   )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
-VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My CNC SAP RESERVATION TO PROJECT', 'Z4837655', 'SAP Reservation from my  CNC to PROJECT', 'historyflag = 0
+VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My CNC SAP RESERVATION TO PROJECT', 'MAXADMIN', 'SAP Reservation from my  CNC to PROJECT', 'historyflag = 0
 
  and po.n_sap_from_sloc  < ''5000''
   and n_po_type=''SAPRESERVATION''
@@ -523,7 +487,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My CNC SAP RESERVATION TO PROJECT', 'Z
   )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
-VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My CNC SAP RESERVATION TO RDC', 'Z4837655', 'SAP Reservation from my  CNC to RDC', 'historyflag = 0 
+VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My CNC SAP RESERVATION TO RDC', 'MAXADMIN', 'SAP Reservation from my  CNC to RDC', 'historyflag = 0 
 
  and po.n_sap_from_sloc  < ''5000''
   and n_po_type=''SAPRESERVATION''
@@ -551,7 +515,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My CNC SAP RESERVATION TO RDC', 'Z4837
   )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
-VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My CNC SAP RESERVATION TO TSU', 'Z4837655', 'SAP Reservation from my  CNC to TSU', 'historyflag = 0 
+VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My CNC SAP RESERVATION TO TSU', 'MAXADMIN', 'SAP Reservation from my  CNC to TSU', 'historyflag = 0 
 
  and po.n_sap_from_sloc  < ''5000''
   and n_po_type=''SAPRESERVATION''
@@ -579,7 +543,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My CNC SAP RESERVATION TO TSU', 'Z4837
   )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
-VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My RDC SAP RESERVATION TO CNC', 'Z4837655', 'SAP Reservation from my  RDC to CNC', 'historyflag = 0
+VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My RDC SAP RESERVATION TO CNC', 'MAXADMIN', 'SAP Reservation from my  RDC to CNC', 'historyflag = 0
 
  and po.n_sap_from_sloc  >= ''5000''
   and n_po_type=''SAPRESERVATION''
@@ -607,7 +571,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My RDC SAP RESERVATION TO CNC', 'Z4837
   )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
-VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My RDC SAP RESERVATION TO CPM', 'Z4837655', 'SAP Reservation from my  RDC to CPM', 'historyflag = 0 
+VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My RDC SAP RESERVATION TO CPM', 'MAXADMIN', 'SAP Reservation from my  RDC to CPM', 'historyflag = 0 
 
  and po.n_sap_from_sloc  >= ''5000''
   and n_po_type=''SAPRESERVATION''
@@ -635,7 +599,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My RDC SAP RESERVATION TO CPM', 'Z4837
   )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
-VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My RDC SAP RESERVATION TO PROJECT', 'Z4837655', 'SAP Reservation from my  RDC to PROJECT', 'historyflag = 0 
+VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My RDC SAP RESERVATION TO PROJECT', 'MAXADMIN', 'SAP Reservation from my  RDC to PROJECT', 'historyflag = 0 
 
  and po.n_sap_from_sloc  >= ''5000''
   and n_po_type=''SAPRESERVATION''
@@ -663,7 +627,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My RDC SAP RESERVATION TO PROJECT', 'Z
   )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
-VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My RDC SAP RESERVATION TO RDC', 'Z4837655', 'SAP Reservation from my RDC to another RDC', 'historyflag = 0
+VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My RDC SAP RESERVATION TO RDC', 'MAXADMIN', 'SAP Reservation from my RDC to another RDC', 'historyflag = 0
  
  and po.n_sap_from_sloc  >= ''5000''
   and n_po_type=''SAPRESERVATION''
@@ -688,6 +652,44 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My RDC SAP RESERVATION TO RDC', 'Z4837
       and poline.siteid = po.siteid 
       and poline.revisionnum = po.revisionnum
       and poline.n_sap_to_sloc >=''5000'' AND poline.N_REMAININGQTY > 0
+  )', 1, 'EN', NULL, NULL, 0, NULL);
+  
+ 
+INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
+VALUES (QUERYSEQ.NEXTVAL, 'N_METERSRECEIPTS', 'MY PO TO BE RECEIVED', 'MAXADMIN', 'Material to be received in My RDC from supplier', 'historyflag = 0  
+  and status = ''APPR''
+  and n_po_type!=''SAPRESERVATION''
+  and receipts != ''COMPLETE'' 
+  and exists (
+    select 1 
+    from poline 
+    where poline.ponum = po.ponum 
+      and poline.siteid = po.siteid 
+      and poline.revisionnum = po.revisionnum
+      and exists (
+        select 1
+        from locations
+        where location in (
+          select n_rdcstoreroom
+          from n_relatedstore
+          where n_cncstoreroom is null 
+           and laborid in (
+            select laborid 
+            from labor 
+            where personid in (
+              select personid 
+              from maxuser 
+              where userid = :user 
+            )
+          )
+        )
+        and (exists( select 1 from n_receivingstore where  n_receivingstore.locationsid = locations.locationsid and n_receivingstore.storeroom = poline.storeloc)
+        or 
+        (
+           poline.storeloc in (location, n_aggregatedstore)
+        )
+        )
+      )
   )', 1, 'EN', NULL, NULL, 0, NULL);
 
 COMMIT;
