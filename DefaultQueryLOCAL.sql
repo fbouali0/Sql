@@ -14,7 +14,7 @@ BEGIN
 END
 COMMIT;
 
-DELETE FROM QUERY WHERE clausename IN ('MY RDC Obsolete meters shipment from CNC','MY CNC SAP RESERVATION TO EP','MY PO TO BE RECEIVED','MY RDC meters shipment from RDC','MY RDC Serviceable meters shipment from CNC','MY CNC meters shipment from RDC','MY RDC Scrappable meters shipment from CNC','MY RDC meters shipment from CPM','MY RDC meters shipment from LAB','My RDC SAP RESERVATION TO RDC','My RDC SAP RESERVATION TO CNC','My RDC SAP RESERVATION TO CPM','My RDC SAP RESERVATION TO PROJECT','MY CNC meters shipment from CNC','MY CNC meters shipment from LAB','My CNC SAP RESERVATION TO RDC','My CNC SAP RESERVATION TO CNC','My CNC SAP RESERVATION TO TSU','My CNC SAP RESERVATION TO PROJECT','MY CPM meters shipment from RDC','MY LAB meters shipment from RDC','MY LAB meters shipment from CNC','MY LAB meters shipment from CPM');
+DELETE FROM QUERY WHERE clausename IN ('MY CPM meters shipment from LAB','MY RDC Obsolete meters shipment from CNC','MY CNC SAP RESERVATION TO EP','MY PO TO BE RECEIVED','MY RDC meters shipment from RDC','MY RDC Serviceable meters shipment from CNC','MY CNC meters shipment from RDC','MY RDC Scrappable meters shipment from CNC','MY RDC meters shipment from CPM','MY RDC meters shipment from LAB','My RDC SAP RESERVATION TO RDC','My RDC SAP RESERVATION TO CNC','My RDC SAP RESERVATION TO CPM','My RDC SAP RESERVATION TO PROJECT','MY CNC meters shipment from CNC','MY CNC meters shipment from LAB','My CNC SAP RESERVATION TO RDC','My CNC SAP RESERVATION TO CNC','My CNC SAP RESERVATION TO TSU','My CNC SAP RESERVATION TO PROJECT','MY CPM meters shipment from RDC','MY LAB meters shipment from RDC','MY LAB meters shipment from CNC','MY LAB meters shipment from CPM');
 COMMIT;
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
@@ -691,5 +691,48 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_METERSRECEIPTS', 'MY PO TO BE RECEIVED', 'MAXADMIN'
         )
       )
   )', 1, 'EN', NULL, NULL, 0, NULL);
+
+INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
+VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY CPM meters shipment from LAB', 'MAXADMIN', 'Shipment of meters from LAB to my CPM', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and invuse.status != ''CANCELLED'' )
+
+  and exists (
+
+    select 1 
+
+    from shipmentline 
+
+    where shipmentline.shipmentnum = shipment.shipmentnum 
+
+      and shipmentline.siteid = shipment.siteid 
+
+      and exists(select 1 from invuseline where invuseline.invuselineid = shipmentline.invuselineid and invuseline.fromstoreloc in (select location from locations where n_type=''LAB''))
+
+      and exists(
+
+          select 1
+
+          from n_relatedstore
+
+          where n_relatedstore.n_cpm_storeroom=shipmentline.tostoreloc and exists(
+
+            select 1 
+
+            from labor 
+
+            where n_type=''CPM'' and labor.laborid=n_relatedstore.laborid and  exists (
+
+              select 1 
+
+              from maxuser 
+
+              where labor.personid=maxuser.personid and  userid =  :user  
+
+            )
+
+          )
+
+        )
+
+      )', 1, 'EN', NULL, NULL, 0, NULL);
 
 COMMIT;
