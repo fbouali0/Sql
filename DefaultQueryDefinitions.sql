@@ -1,4 +1,5 @@
 
+-- Restart the QUERYSEQ sequence to ensure it starts from the correct value
 BEGIN
   DECLARE max_id INTEGER DEFAULT 0;
 
@@ -10,12 +11,12 @@ BEGIN
   -- Restart the sequence with max_id + 1
   EXECUTE IMMEDIATE 'ALTER SEQUENCE QUERYSEQ RESTART WITH ' || max_id;
 END
-COMMIT;
 
-DELETE FROM QUERY WHERE clausename IN ('MY CPM meters shipment from LAB','MY RDC Obsolete meters shipment from CNC','MY CNC SAP RESERVATION TO EP','MY PO TO BE RECEIVED','MY RDC meters shipment from RDC','MY RDC Serviceable meters shipment from CNC','MY CNC meters shipment from RDC','MY RDC Scrappable meters shipment from CNC','MY RDC meters shipment from CPM','MY RDC meters shipment from LAB','My RDC SAP RESERVATION TO RDC','My RDC SAP RESERVATION TO CNC','My RDC SAP RESERVATION TO CPM','My RDC SAP RESERVATION TO PROJECT','MY CNC meters shipment from CNC','MY CNC meters shipment from LAB','My CNC SAP RESERVATION TO RDC','My CNC SAP RESERVATION TO CNC','My CNC SAP RESERVATION TO TSU','My CNC SAP RESERVATION TO PROJECT','MY CPM meters shipment from RDC','MY LAB meters shipment from RDC','MY LAB meters shipment from CNC','MY LAB meters shipment from CPM');
-COMMIT;
+-- Delete if existing queries to avoid duplicates
+DELETE FROM QUERY WHERE clausename IN ('MY CPM meters shipment from LAB','MY RDC Obsolete meters shipment from CNC','MY PO TO BE RECEIVED','MY RDC meters shipment from RDC','MY RDC Serviceable meters shipment from CNC','MY CNC meters shipment from RDC','MY RDC Scrappable meters shipment from CNC','MY RDC meters shipment from CPM','MY RDC meters shipment from LAB','My RDC SAP RESERVATION TO RDC','My RDC SAP RESERVATION TO CNC','My RDC SAP RESERVATION TO CPM','My RDC SAP RESERVATION TO PROJECT','MY CNC meters shipment from CNC','MY CNC meters shipment from LAB','My CNC SAP RESERVATION TO RDC','My CNC SAP RESERVATION TO CNC','My CNC SAP RESERVATION TO TSU','My CNC SAP RESERVATION TO PROJECT','MY CPM meters shipment from RDC','MY LAB meters shipment from RDC','MY LAB meters shipment from CNC','MY LAB meters shipment from CPM');
 
 
+-- Insert new queries for meters shipment and SAP reservations
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
 VALUES (QUERYSEQ.NEXTVAL, 'N_METERSRECEIPTS', 'MY PO TO BE RECEIVED', 'Z4837655', 'Material to be received in My RDC from supplier', 'historyflag = 0  
   and status = ''APPR''
@@ -439,34 +440,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY RDC meters shipment f
       )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
-VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'MY CNC SAP RESERVATION TO EP', 'Z4837655', 'SAP Reservation from my CNC to EP', 'historyflag = 0 
- and po.n_sap_from_sloc  < ''5000''
-  and n_po_type=''SAPRESERVATION''
-  and  exists (
-        select 1 
-          from n_relatedstore
-          where laborid in (
-            select laborid 
-            from labor 
-            where n_type=''CNC'' and personid in (
-              select personid 
-              from maxuser 
-              where userid =:user
-            )
-          )
-          and po.n_sap_from_plant = n_rdcstoreroom and  po.n_sap_from_sloc = n_cncstoreroom 
-        )
-     and  exists (
-    select 1 
-    from poline 
-    where poline.ponum = po.ponum 
-      and poline.siteid = po.siteid 
-      and poline.revisionnum = po.revisionnum
-      and (poline.n_sap_io or poline.n_sap_cc)  is not null AND poline.N_REMAININGQTY > 0
-  )', 1, 'EN', NULL, NULL, 0, NULL);
-
-INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
-VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My CNC SAP RESERVATION TO CNC', 'Z4837655', 'SAP Reservation from my  CNC to another CNC', 'historyflag = 0 
+VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My CNC SAP RESERVATION TO CNC', 'Z4837655', 'SAP Reservation from my CNC to another CNC', 'historyflag = 0 
 
  and po.n_sap_from_sloc <''5000''
   and n_po_type=''SAPRESERVATION''
@@ -495,7 +469,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My CNC SAP RESERVATION TO CNC', 'Z4837
   )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
-VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My CNC SAP RESERVATION TO PROJECT', 'Z4837655', 'SAP Reservation from my  CNC to PROJECT', 'historyflag = 0
+VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My CNC SAP RESERVATION TO PROJECT', 'Z4837655', 'SAP Reservation from my CNC to PROJECT', 'historyflag = 0
 
  and po.n_sap_from_sloc  < ''5000''
   and n_po_type=''SAPRESERVATION''
@@ -523,7 +497,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My CNC SAP RESERVATION TO PROJECT', 'Z
   )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
-VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My CNC SAP RESERVATION TO RDC', 'Z4837655', 'SAP Reservation from my  CNC to RDC', 'historyflag = 0 
+VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My CNC SAP RESERVATION TO RDC', 'Z4837655', 'SAP Reservation from my CNC to RDC', 'historyflag = 0 
 
  and po.n_sap_from_sloc  < ''5000''
   and n_po_type=''SAPRESERVATION''
@@ -551,7 +525,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My CNC SAP RESERVATION TO RDC', 'Z4837
   )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
-VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My CNC SAP RESERVATION TO TSU', 'Z4837655', 'SAP Reservation from my  CNC to TSU', 'historyflag = 0 
+VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My CNC SAP RESERVATION TO TSU', 'Z4837655', 'SAP Reservation from my CNC to TSU/EPO', 'historyflag = 0 
 
  and po.n_sap_from_sloc  < ''5000''
   and n_po_type=''SAPRESERVATION''
@@ -579,7 +553,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My CNC SAP RESERVATION TO TSU', 'Z4837
   )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
-VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My RDC SAP RESERVATION TO CNC', 'Z4837655', 'SAP Reservation from my  RDC to CNC', 'historyflag = 0
+VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My RDC SAP RESERVATION TO CNC', 'Z4837655', 'SAP Reservation from my RDC to CNC', 'historyflag = 0
 
  and po.n_sap_from_sloc  >= ''5000''
   and n_po_type=''SAPRESERVATION''
@@ -607,7 +581,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My RDC SAP RESERVATION TO CNC', 'Z4837
   )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
-VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My RDC SAP RESERVATION TO CPM', 'Z4837655', 'SAP Reservation from my  RDC to CPM', 'historyflag = 0 
+VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My RDC SAP RESERVATION TO CPM', 'Z4837655', 'SAP Reservation from my RDC to CPM', 'historyflag = 0 
 
  and po.n_sap_from_sloc  >= ''5000''
   and n_po_type=''SAPRESERVATION''
@@ -635,7 +609,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My RDC SAP RESERVATION TO CPM', 'Z4837
   )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
-VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My RDC SAP RESERVATION TO PROJECT', 'Z4837655', 'SAP Reservation from my  RDC to PROJECT', 'historyflag = 0 
+VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My RDC SAP RESERVATION TO PROJECT', 'Z4837655', 'SAP Reservation from my RDC to PROJECT', 'historyflag = 0 
 
  and po.n_sap_from_sloc  >= ''5000''
   and n_po_type=''SAPRESERVATION''
