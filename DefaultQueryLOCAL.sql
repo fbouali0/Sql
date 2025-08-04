@@ -170,7 +170,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY LAB meters shipment f
           where n_relatedstore.n_lab_storeroom=shipmentline.tostoreloc and exists(
             select 1 
             from labor 
-            where n_type=''lab'' and labor.laborid=n_relatedstore.laborid and  exists (
+            where n_type=''LAB'' and labor.laborid=n_relatedstore.laborid and  exists (
               select 1 
               from maxuser 
               where labor.personid=maxuser.personid and  userid = :user
