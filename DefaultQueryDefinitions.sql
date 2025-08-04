@@ -78,7 +78,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY CNC meters shipment f
       )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
-VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY CNC meters shipment from LAB', 'Z4837655', 'Shipment of  Meters from LAB to my CNC', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and INVUSE.STATUS != ''CANCELLED'' )
+VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY CNC meters shipment from LAB', 'Z4837655', 'Shipment of  Meters from LAB to my CNC', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and INVUSE.STATUS != ''CANCELLED''  AND invuse.FROMSTORELOC IN (SELECT location FROM LOCATIONS WHERE n_TYPE = ''LAB'') )
   and exists (
     select 1 
     from shipmentline 
@@ -98,7 +98,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY CNC meters shipment f
             )
           )
         )
-        AND invuseline.FROMSTORELOC IN (SELECT location FROM LOCATIONS WHERE n_TYPE = ''LAB'')
+       
         )
       )', 1, 'EN', NULL, NULL, 0, NULL);
 
@@ -127,45 +127,25 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY CNC meters shipment f
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
 VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY CPM meters shipment from RDC', 'Z4837655', 'Shipment of  Meters from RDC to my CPM', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and INVUSE.STATUS != ''CANCELLED'')
-
   and exists (
-
     select 1 
-
     from shipmentline 
-
     where shipmentline.shipmentnum = shipment.shipmentnum 
-
       and shipmentline.siteid = shipment.siteid 
-
       and exists(select 1 from invuseline where invuseline.invuselineid = shipmentline.invuselineid and invuseline.n_sap_from_sloc >= ''5000'')
-
       and exists(
-
           select 1
-
           from n_relatedstore
-
           where n_relatedstore.n_cpm_storeroom=shipmentline.tostoreloc and exists(
-
             select 1 
-
             from labor 
-
             where n_type=''CPM'' and labor.laborid=n_relatedstore.laborid and  exists (
-
               select 1 
-
               from maxuser 
-
               where labor.personid=maxuser.personid and  userid = :user
-
             )
-
           )
-
         )
-
       )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
@@ -212,89 +192,49 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY LAB meters shipment f
       )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
-VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY LAB meters shipment from CPM', 'Z4837655', 'Shipment of  Meters from CPM to my LAB', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and INVUSE.STATUS != ''CANCELLED'' )
-
+VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY LAB meters shipment from CPM', 'Z4837655', 'Shipment of  Meters from CPM to my LAB', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and INVUSE.STATUS != ''CANCELLED'' and invuse.fromstoreloc in (select location from locations where n_type=''CPM''))
   and exists (
-
     select 1 
-
     from shipmentline 
-
     where shipmentline.shipmentnum = shipment.shipmentnum 
-
       and shipmentline.siteid = shipment.siteid 
-
-      and exists(select 1 from invuseline where invuseline.invuselineid = shipmentline.invuselineid and invuseline.fromstoreloc in (select location from locations where n_type=''CPM''))
-
+      and exists(select 1 from invuseline where invuseline.invuselineid = shipmentline.invuselineid )
       and exists(
-
           select 1
-
           from n_relatedstore
-
           where n_relatedstore.n_lab_storeroom=shipmentline.tostoreloc and exists(
-
             select 1 
-
             from labor 
-
             where n_type=''lab'' and labor.laborid=n_relatedstore.laborid and  exists (
-
               select 1 
-
               from maxuser 
-
               where labor.personid=maxuser.personid and  userid = :user
-
             )
-
           )
-
         )
-
       )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
 VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY LAB meters shipment from RDC', 'Z4837655', 'Shipment of  Meters from RDC to my LAB', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and INVUSE.STATUS != ''CANCELLED'')
-
   and exists (
-
     select 1 
-
     from shipmentline 
-
     where shipmentline.shipmentnum = shipment.shipmentnum 
-
       and shipmentline.siteid = shipment.siteid 
-
       and exists(select 1 from invuseline where invuseline.invuselineid = shipmentline.invuselineid and invuseline.n_sap_from_sloc >= ''5000'')
-
       and exists(
-
           select 1
-
           from n_relatedstore
-
           where n_relatedstore.N_lab_STOREROOM=shipmentline.tostoreloc and exists(
-
             select 1 
-
             from labor 
-
             where n_type=''LAB'' and labor.laborid=n_relatedstore.laborid and  exists (
-
               select 1 
-
               from maxuser 
-
               where labor.personid=maxuser.personid and  userid =:user
-
             )
-
           )
-
         )
-
       )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
@@ -367,7 +307,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY RDC Serviceable meter
       )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
-VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY RDC meters shipment from CPM', 'Z4837655', 'Shipment of Meters from CPM to my RDC', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and INVUSE.STATUS != ''CANCELLED'')
+VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY RDC meters shipment from CPM', 'Z4837655', 'Shipment of Meters from CPM to my RDC', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and INVUSE.STATUS != ''CANCELLED''   AND invuse.FROMSTORELOC IN (SELECT location FROM LOCATIONS WHERE n_TYPE = ''CPM''))
   and exists (
     select 1 
     from shipmentline 
@@ -387,12 +327,11 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY RDC meters shipment f
             )
           )
         )
-        AND invuseline.FROMSTORELOC IN (SELECT location FROM LOCATIONS WHERE n_TYPE = ''CPM'')
         )
       )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
-VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY RDC meters shipment from LAB', 'Z4837655', 'Shipment of  Meters from LAB to my RDC', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and INVUSE.STATUS != ''CANCELLED'')
+VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY RDC meters shipment from LAB', 'Z4837655', 'Shipment of  Meters from LAB to my RDC', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and INVUSE.STATUS != ''CANCELLED''  AND invuse.FROMSTORELOC IN (SELECT location FROM LOCATIONS WHERE n_TYPE = ''LAB''))
   and exists (
     select 1 
     from shipmentline 
@@ -412,7 +351,6 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY RDC meters shipment f
             )
           )
         )
-        AND invuseline.FROMSTORELOC IN (SELECT location FROM LOCATIONS WHERE n_TYPE = ''LAB'')
         )
       )', 1, 'EN', NULL, NULL, 0, NULL);
 
@@ -691,46 +629,44 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My RDC SAP RESERVATION TO RDC', 'Z4837
   )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
-VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY CPM meters shipment from LAB', 'Z4837655', 'Shipment of meters from LAB to my CPM', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and invuse.status != ''CANCELLED'' )
-
+VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY CPM meters shipment from LAB', 'Z4837655', 'Shipment of meters from LAB to my CPM', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and invuse.status != ''CANCELLED''  and invuse.fromstoreloc in (select location from locations where n_type=''LAB''))
   and exists (
-
     select 1 
-
     from shipmentline 
-
     where shipmentline.shipmentnum = shipment.shipmentnum 
-
       and shipmentline.siteid = shipment.siteid 
-
-      and exists(select 1 from invuseline where invuseline.invuselineid = shipmentline.invuselineid and invuseline.fromstoreloc in (select location from locations where n_type=''LAB''))
-
+      and exists(select 1 from invuseline where invuseline.invuselineid = shipmentline.invuselineid )
       and exists(
-
           select 1
-
           from n_relatedstore
-
           where n_relatedstore.n_cpm_storeroom=shipmentline.tostoreloc and exists(
-
             select 1 
-
             from labor 
-
             where n_type=''CPM'' and labor.laborid=n_relatedstore.laborid and  exists (
-
               select 1 
-
               from maxuser 
-
               where labor.personid=maxuser.personid and  userid =  :user
-
             )
-
           )
-
         )
-
       )', 1, 'EN', NULL, NULL, 0, NULL);
 
 COMMIT;
+
+
+////////////
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
