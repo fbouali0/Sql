@@ -150,45 +150,25 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY CPM meters shipment f
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
 VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY LAB meters shipment from CNC', 'Z4837655', 'Shipment of  Meters from CNC to my LAB', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and INVUSE.STATUS != ''CANCELLED'')
-
   and exists (
-
     select 1 
-
     from shipmentline 
-
     where shipmentline.shipmentnum = shipment.shipmentnum 
-
       and shipmentline.siteid = shipment.siteid 
-
       and exists(select 1 from invuseline where invuseline.invuselineid = shipmentline.invuselineid and invuseline.n_sap_from_sloc < ''5000'')
-
       and exists(
-
           select 1
-
           from n_relatedstore
-
           where n_relatedstore.n_lab_storeroom=shipmentline.tostoreloc and exists(
-
             select 1 
-
             from labor 
-
             where n_type=''LAB'' and labor.laborid=n_relatedstore.laborid and  exists (
-
               select 1 
-
               from maxuser 
-
               where labor.personid=maxuser.personid and  userid =:USER 
-
             )
-
           )
-
         )
-
       )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
@@ -379,10 +359,9 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY RDC meters shipment f
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
 VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My CNC SAP RESERVATION TO CNC', 'Z4837655', 'SAP Reservation from my CNC to another CNC', 'historyflag = 0 
-
- and po.n_sap_from_sloc <''5000''
-  and n_po_type=''SAPRESERVATION''
-  and  exists (
+    and po.n_sap_from_sloc <''5000''
+    and n_po_type=''SAPRESERVATION''
+    and  exists (
         select 1 
           from n_relatedstore
           where laborid in (
@@ -391,28 +370,30 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My CNC SAP RESERVATION TO CNC', 'Z4837
             where n_type=''CNC'' and  personid in (
               select personid 
               from maxuser 
-              where userid = :user 
+              where userid = :user
             )
           )
           and po.n_sap_from_sloc = n_cncstoreroom 
           and po.n_sap_from_plant = n_rdcstoreroom
         )
-     and  exists (
-    select 1 
-    from poline 
-    where poline.ponum = po.ponum 
-      and poline.siteid = po.siteid 
-      and poline.revisionnum = po.revisionnum
-      and poline.n_sap_to_sloc < ''5000'' AND poline.N_REMAININGQTY > 0
+    and  exists (
+        select 1 
+        from poline 
+        where poline.ponum = po.ponum 
+            and poline.siteid = po.siteid 
+            and poline.revisionnum = po.revisionnum
+            and poline.n_sap_to_sloc < ''5000'' AND poline.N_REMAININGQTY > 0 
+            and (POLINE.N_IGNORERECEIPT=0 and POLINE.N_DELETED=0)
+            AND ( NOT EXISTS (SELECT 1 FROM LOCATIONS loc WHERE loc.LOCATION = po.N_SAP_FROM_PLANT 
+                and coalesce(loc.N_AGGREGATEDSTORE,loc.LOCATION) = poline.STORELOC ) OR PO.N_SAP_FROM_SLOC != POLINE.N_SAP_TO_SLOC)
   )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
 VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My CNC SAP RESERVATION TO PROJECT', 'Z4837655', 'SAP Reservation from my CNC to PROJECT', 'historyflag = 0
-
-  and po.n_sap_from_sloc  < ''5000''
-  and n_po_type=''SAPRESERVATION''
-  and N_SAP_TRANSACTION_TYPE IN (''221'',''222'')
-  and  exists (
+    and po.n_sap_from_sloc  < ''5000''
+    and n_po_type=''SAPRESERVATION''
+    and N_SAP_TRANSACTION_TYPE IN (''221'',''222'')
+    and  exists (
         select 1 
           from n_relatedstore
           where laborid in (
@@ -426,22 +407,21 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My CNC SAP RESERVATION TO PROJECT', 'Z
           )
           and po.n_sap_from_plant = n_rdcstoreroom and  po.n_sap_from_sloc = n_cncstoreroom 
         )
-     and  exists (
-    select 1 
-    from poline 
-    where poline.ponum = po.ponum 
-      and poline.siteid = po.siteid 
-      and poline.revisionnum = po.revisionnum
-      and poline.n_sap_wbs is not null  AND POLINE.N_SAP_CC IS NULL 
-      AND POLINE.N_SAP_IO IS  NULL  AND poline.N_REMAININGQTY > 0 and (POLINE.N_IGNORERECEIPT=0 and POLINE.N_DELETED=0)
+    and  exists (
+        select 1 
+        from poline 
+        where poline.ponum = po.ponum 
+            and poline.siteid = po.siteid 
+            and poline.revisionnum = po.revisionnum
+            and poline.n_sap_wbs is not null  AND POLINE.N_SAP_CC IS NULL 
+            AND POLINE.N_SAP_IO IS  NULL  AND poline.N_REMAININGQTY > 0 and (POLINE.N_IGNORERECEIPT=0 and POLINE.N_DELETED=0)
   )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
 VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My CNC SAP RESERVATION TO RDC', 'Z4837655', 'SAP Reservation from my CNC to RDC', 'historyflag = 0 
-
- and po.n_sap_from_sloc  < ''5000''
-  and n_po_type=''SAPRESERVATION''
-  and  exists (
+    and po.n_sap_from_sloc  < ''5000''
+    and n_po_type=''SAPRESERVATION''
+    and  exists (
         select 1 
           from n_relatedstore
           where laborid in (
@@ -455,22 +435,22 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My CNC SAP RESERVATION TO RDC', 'Z4837
           )
           and po.n_sap_from_plant = n_rdcstoreroom and  po.n_sap_from_sloc = n_cncstoreroom
         )
-     and  exists (
-    select 1 
-    from poline 
-    where poline.ponum = po.ponum 
-      and poline.siteid = po.siteid 
-      and poline.revisionnum = po.revisionnum
-      and poline.n_sap_to_sloc >=''5000'' AND poline.N_REMAININGQTY > 0
+    and  exists (
+        select 1 
+        from poline 
+        where poline.ponum = po.ponum 
+            and poline.siteid = po.siteid 
+            and poline.revisionnum = po.revisionnum
+            and poline.n_sap_to_sloc >=''5000'' AND poline.N_REMAININGQTY > 0 
+            and (POLINE.N_IGNORERECEIPT=0 and POLINE.N_DELETED=0)
   )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
 VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My CNC SAP RESERVATION TO TSU', 'Z4837655', 'SAP Reservation from my CNC to TSU/EPO', 'historyflag = 0 
-
-  and po.n_sap_from_sloc  < ''5000''
-  and po.n_po_type=''SAPRESERVATION''
-  AND po.N_SAP_TRANSACTION_TYPE IN (''221'',''222'',''201'',''202'',''261'',''262'')
-  and  exists (
+    and po.n_sap_from_sloc  < ''5000''
+    and po.n_po_type=''SAPRESERVATION''
+    AND po.N_SAP_TRANSACTION_TYPE IN (''221'',''222'',''201'',''202'',''261'',''262'')
+    and  exists (
         select 1 
           from n_relatedstore
           where laborid in (
@@ -485,24 +465,23 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My CNC SAP RESERVATION TO TSU', 'Z4837
           and po.n_sap_from_plant = n_rdcstoreroom and  po.n_sap_from_sloc = n_cncstoreroom 
         )
      and  exists (
-    select 1 
-    from poline 
-    where poline.ponum = po.ponum 
-      and poline.siteid = po.siteid 
-      and poline.revisionnum = po.revisionnum
-      and (poline.n_sap_io  is not null or POLINE.N_SAP_WBS IS NOT NULL 
-              OR POLINE.N_SAP_CC IS NOT NULL  ) 
-      AND POLINE.N_SAP_TO_PLANT IS NULL 
-      AND POLINE.N_SAP_TO_SLOC IS NULL
-      AND poline.N_REMAININGQTY > 0
+        select 1 
+        from poline 
+        where poline.ponum = po.ponum 
+            and poline.siteid = po.siteid 
+            and poline.revisionnum = po.revisionnum
+            and (poline.n_sap_io  is not null or POLINE.N_SAP_WBS IS NOT NULL OR POLINE.N_SAP_CC IS NOT NULL  ) 
+            AND POLINE.N_SAP_TO_PLANT IS NULL 
+            AND POLINE.N_SAP_TO_SLOC IS NULL
+            AND poline.N_REMAININGQTY > 0 
+            and (POLINE.N_IGNORERECEIPT=0 and POLINE.N_DELETED=0)
   )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
 VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My RDC SAP RESERVATION TO CNC', 'Z4837655', 'SAP Reservation from my RDC to CNC', 'historyflag = 0
-
- and po.n_sap_from_sloc  >= ''5000''
-  and n_po_type=''SAPRESERVATION''
-  and  exists (
+    and po.n_sap_from_sloc  >= ''5000''
+    and n_po_type=''SAPRESERVATION''
+    and  exists (
         select 1 
           from n_relatedstore
           where laborid in (
@@ -517,19 +496,20 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My RDC SAP RESERVATION TO CNC', 'Z4837
           and po.n_sap_from_plant = n_rdcstoreroom
         )
      and  exists (
-    select 1 
-    from poline 
-    where poline.ponum = po.ponum 
-      and poline.siteid = po.siteid 
-      and poline.revisionnum = po.revisionnum
-      and poline.n_sap_to_sloc < ''5000'' AND poline.N_REMAININGQTY > 0
+        select 1 
+        from poline 
+        where poline.ponum = po.ponum 
+            and poline.siteid = po.siteid 
+            and poline.revisionnum = po.revisionnum
+            and poline.n_sap_to_sloc < ''5000'' AND poline.N_REMAININGQTY > 0 
+            and (POLINE.N_IGNORERECEIPT=0 and POLINE.N_DELETED=0)
   )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
 VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My RDC SAP RESERVATION TO CPM', 'Z4837655', 'SAP Reservation from my RDC to CPM', '(historyflag = 0 
-and po.n_sap_from_sloc  >= ''5000''
-  and n_po_type=''SAPRESERVATION''
-  and  exists (
+    and po.n_sap_from_sloc  >= ''5000''
+    and n_po_type=''SAPRESERVATION''
+    and  exists (
         select 1 
           from n_relatedstore
           where laborid in (
@@ -543,36 +523,35 @@ and po.n_sap_from_sloc  >= ''5000''
           )
           and po.n_sap_from_plant = n_rdcstoreroom
         )
-     and  exists (
-    select 1 
-    from poline 
-    where poline.ponum = po.ponum 
-      and poline.siteid = po.siteid 
-      and poline.revisionnum = po.revisionnum
-      and poline.storeloc in ( select location from locations where n_type=''CPM'') AND poline.N_REMAININGQTY > 0
-  ))
-
- and ( (N_SAP_TRANSACTION_TYPE LIKE ''2%'' 
-    AND EXISTS (
-        SELECT 1 
-        FROM POLINE 
-        WHERE PO.PONUM = POLINE.PONUM 
-          AND POLINE.N_SAP_TO_PLANT IS NULL 
-          AND POLINE.N_SAP_TO_SLOC IS NULL
+    and  exists (
+        select 1 
+        from poline 
+        where poline.ponum = po.ponum 
+            and poline.siteid = po.siteid 
+            and poline.revisionnum = po.revisionnum
+            and poline.storeloc in ( select location from locations where n_type=''CPM'') AND poline.N_REMAININGQTY > 0
+            and (POLINE.N_IGNORERECEIPT=0 and POLINE.N_DELETED=0)
     ))
-  OR (
-    N_SAP_TRANSACTION_TYPE LIKE ''3%'' 
+    and ( (N_SAP_TRANSACTION_TYPE LIKE ''2%'' 
     AND EXISTS (
-        SELECT 1 
-        FROM POLINE 
-        WHERE PO.PONUM = POLINE.PONUM 
-          AND POLINE.N_SAP_TO_SLOC = ''5033''
+            SELECT 1 
+            FROM POLINE 
+            WHERE PO.PONUM = POLINE.PONUM 
+                AND POLINE.N_SAP_TO_PLANT IS NULL 
+            AND POLINE.N_SAP_TO_SLOC IS NULL
+    ))
+    OR (
+        N_SAP_TRANSACTION_TYPE LIKE ''3%'' 
+        AND EXISTS (
+            SELECT 1 
+            FROM POLINE 
+            WHERE PO.PONUM = POLINE.PONUM 
+                AND POLINE.N_SAP_TO_SLOC = ''5033''
     )
 ))', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
 VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My RDC SAP RESERVATION TO PROJECT', 'Z4837655', 'SAP Reservation from my RDC to PROJECT', 'historyflag = 0 
-
   and po.n_sap_from_sloc  >= ''5000''
   and n_po_type=''SAPRESERVATION''
   and N_SAP_TRANSACTION_TYPE IN (''221'',''222'')
@@ -598,11 +577,11 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My RDC SAP RESERVATION TO PROJECT', 'Z
       and poline.revisionnum = po.revisionnum
       and poline.n_sap_wbs is not null  AND POLINE.N_SAP_CC IS NULL 
       AND POLINE.N_SAP_IO IS  NULL  AND poline.N_REMAININGQTY > 0
+      and (POLINE.N_IGNORERECEIPT=0 and POLINE.N_DELETED=0)
   )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
 VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My RDC SAP RESERVATION TO RDC', 'Z4837655', 'SAP Reservation from my RDC to another RDC', 'historyflag = 0
- 
  and po.n_sap_from_sloc  >= ''5000''
   and n_po_type=''SAPRESERVATION''
   and  exists (
@@ -614,7 +593,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My RDC SAP RESERVATION TO RDC', 'Z4837
             where n_type=''RDC'' and personid in (
               select personid 
               from maxuser 
-              where userid = :user 
+              where userid = :user
             )
           )
           and po.n_sap_from_plant = n_rdcstoreroom
@@ -625,7 +604,9 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My RDC SAP RESERVATION TO RDC', 'Z4837
     where poline.ponum = po.ponum 
       and poline.siteid = po.siteid 
       and poline.revisionnum = po.revisionnum
-      and poline.n_sap_to_sloc >=''5000'' AND poline.N_REMAININGQTY > 0
+      and poline.n_sap_to_sloc >=''5000'' AND poline.N_REMAININGQTY > 0 and (POLINE.N_IGNORERECEIPT=0 and POLINE.N_DELETED=0)
+      AND NOT EXISTS (SELECT 1 FROM LOCATIONS loc WHERE loc.LOCATION = po.N_SAP_FROM_PLANT 
+      and coalesce(loc.N_AGGREGATEDSTORE,loc.LOCATION) = poline.STORELOC )
   )', 1, 'EN', NULL, NULL, 0, NULL);
 
 INSERT INTO MAXIMO.QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
@@ -652,9 +633,6 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY CPM meters shipment f
       )', 1, 'EN', NULL, NULL, 0, NULL);
 
 COMMIT;
-
-
-////////////
 
 
 
