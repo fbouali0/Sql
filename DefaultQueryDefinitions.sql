@@ -529,7 +529,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My RDC SAP RESERVATION TO CPM', 'Z4837
         where poline.ponum = po.ponum 
             and poline.siteid = po.siteid 
             and poline.revisionnum = po.revisionnum
-            and poline.storeloc in ( select location from locations where n_type=''CPM'') AND poline.N_REMAININGQTY > 0
+             AND poline.N_REMAININGQTY > 0
             and (POLINE.N_IGNORERECEIPT=0 and POLINE.N_DELETED=0)
     ))
     and ( (N_SAP_TRANSACTION_TYPE LIKE ''2%'' 
