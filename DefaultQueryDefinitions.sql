@@ -9,7 +9,7 @@ BEGIN
   FROM QUERY;
 
   -- Restart the sequence with max_id + 1
-  EXECUTE IMMEDIATE 'ALTER SEQUENCE QUERYSEQ RESTART WITH ' || max_id;
+  EXECUTE IMMEDIATE 'ALTER SEQUENCE QUERYSEQ RESTART WITH ' || (max_id + 1);
 END
 
 -- Delete if existing queries to avoid duplicates
