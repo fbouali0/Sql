@@ -15,7 +15,7 @@ END
 
 
 -- Delete if existing queries to avoid duplicates
-DELETE FROM QUERY WHERE clausename IN ('MY CPM meters shipment from LAB','MY RDC Obsolete meters shipment from CNC','MY PO TO BE RECEIVED','MY RDC meters shipment from RDC','MY RDC Serviceable meters shipment from CNC','MY CNC meters shipment from RDC','MY RDC Scrappable meters shipment from CNC','MY RDC meters shipment from CPM','MY RDC meters shipment from LAB','My RDC SAP RESERVATION TO RDC','My RDC SAP RESERVATION TO CNC','My RDC SAP RESERVATION TO CPM','My RDC SAP RESERVATION TO PROJECT','MY CNC meters shipment from CNC','MY CNC meters shipment from LAB','My CNC SAP RESERVATION TO RDC','My CNC SAP RESERVATION TO CNC','My CNC SAP RESERVATION TO TSU','My CNC SAP RESERVATION TO PROJECT','MY CPM meters shipment from RDC','MY LAB meters shipment from RDC','MY LAB meters shipment from CNC','MY LAB meters shipment from CPM');
+DELETE FROM QUERY WHERE clausename IN ('MY CPM meters shipment from LAB','MY RDC Obsolete meters shipment from CNC','MY PO TO BE RECEIVED','MY RDC meters shipment from RDC','MY RDC Serviceable meters shipment from CNC','MY CNC meters shipment from RDC','MY RDC Scrappable meters shipment from CNC','MY RDC meters shipment from CPM','MY RDC meters shipment from LAB','My RDC SAP RESERVATION TO RDC','My RDC SAP RESERVATION TO CNC','My RDC SAP RESERVATION TO CPM','My RDC SAP RESERVATION TO PROJECT','MY CNC meters shipment from CNC','MY CNC meters shipment from LAB','My CNC SAP RESERVATION TO RDC','My CNC SAP RESERVATION TO CNC','My CNC SAP RESERVATION TO TSU','My CNC SAP RESERVATION TO PROJECT','MY CPM meters shipment from RDC','MY LAB meters shipment from RDC','MY LAB meters shipment from CNC','MY LAB meters shipment from CPM','MY RDC WARRANTY meters shipment from CNC');
 
 
 -- Insert new queries for meters shipment and SAP reservations
@@ -632,6 +632,29 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY CPM meters shipment f
               where labor.personid=maxuser.personid and  userid =  :user
             )
           )
+        )
+      )', 1, 'EN', NULL, NULL, 0, NULL);
+
+INSERT INTO QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
+VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY RDC WARRANTY meters shipment from CNC', 'MAXADMIN', 'Shipment of  Warranty Meters from CNC to my RDC', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and invuse.status != ''CANCELLED'' )
+  and exists (
+    select 1 
+    from shipmentline 
+    where shipmentline.shipmentnum = shipment.shipmentnum 
+      and shipmentline.siteid = shipment.siteid 
+      and exists(select 1 from invuselinesplit where invuselinesplit.invuselinesplitid = shipmentline.invuselinesplitid and exists(select 1 from asset where invuselinesplit.rotassetnum = asset.assetnum and invuselinesplit.siteid = asset.siteid and asset.n_meteractionstatus = ''UNDER WARRANTY – SEND TO VENDOR'' ))
+      and exists(
+          select 1
+          from n_relatedstore
+          where laborid in (
+            select laborid 
+            from labor 
+            where n_type=''RDC'' and personid in (
+              select personid 
+              from maxuser 
+              where userid = :user  
+            )
+          )  and exists(select 1 from invuseline where invuseline.invuselineid = shipmentline.invuselineid and invuseline.n_sap_to_sloc >=''5000'' and invuseline.n_sap_from_sloc <''5000'' and invuseline.n_sap_to_plant=n_rdcstoreroom)
         )
       )', 1, 'EN', NULL, NULL, 0, NULL);
 
