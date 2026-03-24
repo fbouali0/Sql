@@ -529,7 +529,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_SAPRESERV', 'My RDC SAP RESERVATION TO CPM', 'Z4837
         where poline.ponum = po.ponum 
             and poline.siteid = po.siteid 
             and poline.revisionnum = po.revisionnum
-            and poline.storeloc in ( select location from locations where n_type=''CPM'') AND poline.N_REMAININGQTY > 0
+             AND poline.N_REMAININGQTY > 0
             and (POLINE.N_IGNORERECEIPT=0 and POLINE.N_DELETED=0)
     ))
     and ( (N_SAP_TRANSACTION_TYPE LIKE ''2%'' 
@@ -632,8 +632,8 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY CPM meters shipment f
         )
       )', 1, 'EN', NULL, NULL, 0, NULL);
 
-INSERT INTO QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
-VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY RDC WARRANTY meters shipment from CNC', 'Z4837655', 'Shipment of  Warranty Meters from CNC to my RDC', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and invuse.status != ''CANCELLED'' )
+  INSERT INTO QUERY (QUERYID, APP, CLAUSENAME, OWNER, DESCRIPTION, CLAUSE, ISPUBLIC, LANGCODE, INTOBJECTNAME, PRIORITY, ISUSERLIST, NOTES)
+  VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY RDC WARRANTY meters shipment from CNC', 'Z4837655', 'Shipment of  Warranty Meters from CNC to my RDC', 'exists(select 1 from invuse where invuse.invusenum = shipment.invusenum and invuse.siteid = shipment.siteid and invuse.receipts != ''COMPLETE'' and invuse.status != ''CANCELLED'' )
   and exists (
     select 1 
     from shipmentline 
