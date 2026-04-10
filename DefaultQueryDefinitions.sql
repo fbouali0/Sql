@@ -28,6 +28,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_METERSRECEIPTS', 'MY PO TO BE RECEIVED', 'Z4837655'
     where poline.ponum = po.ponum 
       and poline.siteid = po.siteid 
       and poline.revisionnum = po.revisionnum
+	    and poline.N_DELETED = 0 and POLINE.N_IGNORERECEIPT = 0
       and exists (
         select 1
         from locations
@@ -41,11 +42,11 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_METERSRECEIPTS', 'MY PO TO BE RECEIVED', 'Z4837655'
             where personid in (
               select personid 
               from maxuser 
-              where userid = :user 
+              where userid = :user
             )
           )
         )
-        and (exists( select 1 from n_receivingstore where  n_receivingstore.locationsid = locations.locationsid and n_receivingstore.storeroom = poline.storeloc)
+        and (exists( select 1 from locations loc where  loc.location = poline.N_SAP_TO_PLANT and loc.locationsid in ( select locationsid from n_receivingstore where  n_receivingstore.storeroom = locations.location))
         or 
         (
            poline.storeloc in (location, n_aggregatedstore)
