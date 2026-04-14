@@ -29,6 +29,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_METERSRECEIPTS', 'MY PO TO BE RECEIVED', 'Z4837655'
       and poline.siteid = po.siteid 
       and poline.revisionnum = po.revisionnum
 	    and poline.N_DELETED = 0 and POLINE.N_IGNORERECEIPT = 0
+      and poline.N_REMAININGQTY > 0
       and exists (
         select 1
         from locations
