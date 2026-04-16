@@ -235,7 +235,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_METERS_SHIPMENTRECEIPTS', 'MY RDC Serviceable meter
     from shipmentline 
     where shipmentline.shipmentnum = shipment.shipmentnum 
       and shipmentline.siteid = shipment.siteid 
-      and exists(select 1 from invuselinesplit where invuselinesplit.invuselinesplitid = shipmentline.invuselinesplitid and exists(select 1 from asset where invuselinesplit.rotassetnum = asset.assetnum and invuselinesplit.siteid = asset.siteid ))
+      and exists(select 1 from invuselinesplit where invuselinesplit.invuselinesplitid = shipmentline.invuselinesplitid and exists(select 1 from asset where invuselinesplit.rotassetnum = asset.assetnum and invuselinesplit.siteid = asset.siteid and asset.n_meteractionstatus not in  (''SCRAPPABLE'',''UNDER WARRANTY – SEND TO VENDOR'') ))
       and exists(
           select 1
           from n_relatedstore
@@ -587,7 +587,7 @@ VALUES (QUERYSEQ.NEXTVAL, 'N_METERSRECEIPTS', 'MY PO TO BE RECEIVED', 'MAXADMIN'
       and poline.siteid = po.siteid 
       and poline.revisionnum = po.revisionnum
 	    and poline.N_DELETED = 0 and POLINE.N_IGNORERECEIPT = 0
-      and poline.N_REMAININGQTY > 0
+      and poline.receiptscomplete = 0
       and exists (
         select 1
         from locations
